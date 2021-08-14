@@ -19,12 +19,8 @@
       height: 100%;
     }
 
-    .left {
-      background-color: #BBBBBB;
-    }
-
     .right {
-      background-color: #CCCCCC;
+      background-color: #DDDDDD;
     }
 
     .left .value {
@@ -34,18 +30,48 @@
     .right .value {
       font-size: 7.5vw;
     }
+
+    .good {
+      background-color: #007700;
+      color: #FFF;
+    }
+
+    .poor {
+      background-color: #EEBB00;
+      color: #FFF;
+    }
+
+    .bad {
+      background-color: #770000;
+      color: #FFF;
+    }
   </style>
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
   <script>
     function refreshUI() {
+      let $left = $('.left');
+      let $hcho = $('.hcho .value');
+      let $temperature = $('.temperature .value');
+      let $humidity = $('.humidity .value');
+
       $.get('index.json', (data) => {
         let hcho = Math.round(data.hcho);
         let temperature = Math.round(data.temperature);
         let humidity = Math.round(data.humidity);
 
-        $('.hcho .value').html(hcho);
-        $('.temperature .value').html(`${temperature}°`);
-        $('.humidity .value').html(humidity);
+        $hcho.html(hcho);
+        $temperature.html(`${temperature}°`);
+        $humidity.html(humidity);
+
+        if (hcho > 80) {
+          $left.removeClass('good poor bad').addClass('bad')
+        }
+        else if (hcho > 16) {
+          $left.removeClass('good poor bad').addClass('poor')
+        }
+        else {
+          $left.removeClass('good poor bad').addClass('good')
+        }
 
         setTimeout(refreshUI, 2000);
       });
@@ -76,3 +102,5 @@
   </div>
 </body>
 </html>
+
+
