@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .left {
+      background-color: #BBBBBB;
+    }
+
+    .right {
+      background-color: #CCCCCC;
+    }
+
+    .left .value {
+      font-size: 25vw;
+    }
+
+    .right .value {
+      font-size: 7.5vw;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+  <script>
+    function refreshUI() {
+      $.get('index.json', (data) => {
+        let hcho = Math.round(data.hcho);
+        let temperature = Math.round(data.temperature);
+        let humidity = Math.round(data.humidity);
+
+        $('.hcho .value').html(hcho);
+        $('.temperature .value').html(`${temperature}°`);
+        $('.humidity .value').html(humidity);
+
+        setTimeout(refreshUI, 2000);
+      });
+    }
+
+    $(function() {
+      refreshUI();
+    });
+  </script>
+</head>
+<body>
+  <div id="canvas" class="d-flex flex-row">
+    <div class="left col-6 d-flex flex-row justify-content-center align-items-center">
+      <div class="hcho d-flex flex-row">
+        <div class="value fw-bold">0</div>
+        <div class="unit d-flex align-items-center">ppb</div>
+      </div>
+    </div>
+    <div class="right col-6 d-flex flex-column justify-content-center align-items-center">
+      <div class="temperature d-flex flex-row">
+        <div class="value">0°</div>
+      </div>
+      <div class="humidity d-flex flex-row">
+        <div class="value">64</div>
+        <div class="unit d-flex align-items-center">%</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
