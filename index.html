@@ -54,7 +54,8 @@
       let $temperature = $('.temperature .value');
       let $humidity = $('.humidity .value');
 
-      $.get('index.json', (data) => {
+      $.get('index.json')
+      .done((data) => {
         let hcho = Math.round(data.hcho);
         let temperature = Math.round(data.temperature);
         let humidity = Math.round(data.humidity);
@@ -73,6 +74,8 @@
           $left.removeClass('good poor bad').addClass('good')
         }
 
+      })
+      .always(() => {
         setTimeout(refreshUI, 2000);
       });
     }
