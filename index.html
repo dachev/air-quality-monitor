@@ -27,8 +27,8 @@
 
     .metric .label {
       padding: 0px 10px;
-      background-color: rgba(0,0,0,0.2);
-      color: #FFF;
+      background-color: rgba(0,0,0,0.15);
+      color: rgba(255,255,255,0.75);
     }
 
     .metric .value {
@@ -168,6 +168,8 @@
     ];
 
     function refreshUI() {
+      let pmClasses = 'grade1 grade2 grade3 grade4 grade5 grade6 grade7';
+      let hchoClasses = 'good poor bad';
       let $aqi = $('.aqi');
       let $temperature = $('.temperature');
       let $humidity = $('.humidity');
@@ -178,44 +180,48 @@
 
       $.get('index.json')
       .done((data) => {
-        let temperatureReading = Math.round(data.temperature);
-        let humidityReading = Math.round(data.humidity);
-        let hchoReading = Math.round(data.hcho);
-        
-        let hchoClasses = 'good poor bad';
-        if (hchoReading > 80) {
-          $hcho.removeClass(hchoClasses).addClass('bad');
-        }
-        else if (hchoReading > 16) {
-          $hcho.removeClass(hchoClasses).addClass('poor');
-        }
-        else {
-          $hcho.removeClass(hchoClasses).addClass('good');
-        }
+        let temperatureReading = data.temperature;
+        let humidityReading = data.humidity;
+        let hchoReading = data.hcho;
+        let hchoClass = calculateHCHOClass(hchoReading);
 
-        $temperature.find('.value').html(`${temperatureReading}°`);
-        $humidity.find('.value').html(humidityReading);
-        $hcho.find('.value').html(hchoReading);
+        $temperature.find('.value').html(`${Math.round(temperatureReading)}°`);
+        $humidity.find('.value').html(Math.round(humidityReading));
+        $hcho.removeClass(hchoClasses).addClass(hchoClass)
+          .find('.value').html(Math.round(hchoReading));
 
-
-        let pm25Reading = Math.round(data['pm2.5']);
-        let pm40Reading = Math.round(data['pm4.0']);
-        let pm10Reading = Math.round(data['pm10.0']);
-        let gradeClasses = 'grade1 grade2 grade3 grade4 grade5 grade6 grade7';
+        let pm25Reading = data['pm2.5'];
+        let pm40Reading = data['pm4.0'];
+        let pm10Reading = data['pm10.0'];
         let aqiComponents = calculateAQIs(pm25Reading, pm40Reading, pm10Reading);
 
-        $pm25.removeClass(gradeClasses).addClass(aqiComponents.pm25.bracket.grade).find('.value').html(pm25Reading);
-        $pm40.removeClass(gradeClasses).addClass(aqiComponents.pm40.bracket.grade).find('.value').html(pm40Reading);
-        $pm10.removeClass(gradeClasses).addClass(aqiComponents.pm10.bracket.grade).find('.value').html(pm10Reading);
+        $pm25.removeClass(pmClasses).addClass(aqiComponents.pm25.bracket.grade)
+          .find('.value').html(Math.round(pm25Reading));
+        $pm40.removeClass(pmClasses).addClass(aqiComponents.pm40.bracket.grade)
+          .find('.value').html(Math.round(pm40Reading));
+        $pm10.removeClass(pmClasses).addClass(aqiComponents.pm10.bracket.grade)
+          .find('.value').html(Math.round(pm10Reading));
 
         let maxAqiComponent = _.max(Object.values(aqiComponents), (item) => {
           return item.score;
         });
-        $aqi.removeClass(gradeClasses).addClass(maxAqiComponent.bracket.grade).find('.value').html(maxAqiComponent.score);
+        $aqi.removeClass(pmClasses).addClass(maxAqiComponent.bracket.grade).find('.value').html(maxAqiComponent.score);
       })
       .always(() => {
         setTimeout(refreshUI, 2000);
       });
+    }
+
+    function calculateHCHOClass(hchoReading) {
+      if (hchoReading > 80) {
+        return 'bad';
+      }
+      else if (hchoReading > 16) {
+        return 'poor';
+      }
+      else {
+        return 'good';
+      }
     }
 
     function calculateAQIs(pm25Reading, pm40Reading, pm10Reading) {
