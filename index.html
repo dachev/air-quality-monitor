@@ -20,66 +20,65 @@
     }
 
     .metric {
+      position: relative;
       background-color: #EEEEEE;
       border-color: #FFFFFF !important;
     }
 
+    .metric .label {
+      padding: 0px 10px;
+      background-color: rgba(0,0,0,0.2);
+      color: #FFF;
+    }
+
     .metric .value {
-      font-size: 5vw;
+      font-size: 7vw;
+      color: #FFF;
     }
 
     .metric.aqi .value {
       font-size: 20vw;
+      color: #FFF;
     }
 
     .metric.grade1 {
       background-color: #007700;
-      color: #FFF;
     }
 
     .metric.grade2 {
       background-color: #EEBB00;
-      color: #FFF;
     }
 
     .metric.grade3 {
       background-color: #FF7E00;
-      color: #FFF;
     }
 
     .metric.grade4 {
       background-color: #FF0000;
-      color: #FFF;
     }
 
     .metric.grade5 {
       background-color: #99004c;
-      color: #FFF;
     }
 
     .metric.grade6 {
       background-color: #7e0023;
-      color: #FFF;
     }
 
     .metric.grade7 {
       background-color: #7e0023;
-      color: #FFF;
     }
 
     .metric.good {
       background-color: #007700;
-      color: #FFF;
     }
 
     .metric.poor {
       background-color: #EEAA00;
-      color: #FFF;
     }
 
     .metric.bad {
       background-color: #770000;
-      color: #FFF;
     }
   </style>
   <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
@@ -259,29 +258,36 @@
     <div class="d-flex flex-row col-6 left">
       <div class="d-flex flex-column col-6 sfa30">
         <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0 metric temperature">
+          <small class="label position-absolute top-0 start-0">temperature</small>
           <div class="value fw-bold">0°</div>
         </div>
         <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0 metric humidity">
+          <small class="label position-absolute top-0 start-0">humidity</small>
           <div class="value fw-bold">0</div>
         </div>
         <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0  border-bottom-0 metric hcho">
+          <small class="label position-absolute top-0 start-0">hcho</small>
           <div class="value fw-bold">0</div>
         </div>
       </div>
       <div class="d-flex flex-column col-6 sps30">
         <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 metric pm25">
+          <small class="label position-absolute top-0 start-0">pm2.5</small>
           <div class="value fw-bold">0°</div>
         </div>
         <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 metric pm40">
+          <small class="label position-absolute top-0 start-0">pm4.0</small>
           <div class="value fw-bold">0</div>
         </div>
         <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0  border-bottom-0 metric pm10">
+          <small class="label position-absolute top-0 start-0">pm10</small>
           <div class="value fw-bold">0</div>
         </div>
       </div>
     </div>
     <div class="col-6 d-flex flex-column right">
       <div class="d-flex flex-row flex-fill justify-content-center align-items-center metric aqi">
+        <small class="label position-absolute top-0 end-0">aqi</small>
         <div class="value fw-bold">0</div>
       </div>
     </div>
