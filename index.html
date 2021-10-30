@@ -169,6 +169,8 @@
 
     function refreshUI() {
       let pmClasses = 'grade1 grade2 grade3 grade4 grade5 grade6 grade7';
+      let temperatureClasses = 'cold hot temperate';
+      let humidityClasses = 'dry humid temperate';
       let hchoClasses = 'good poor bad';
       let $aqi = $('.aqi');
       let $temperature = $('.temperature');
@@ -183,10 +185,14 @@
         let temperatureReading = data.temperature;
         let humidityReading = data.humidity;
         let hchoReading = data.hcho;
+        let temperatureClass = calculateTemperatureClass(temperatureReading);
+        let humidityClass = calculateHumidityClass(humidityReading);
         let hchoClass = calculateHCHOClass(hchoReading);
 
-        $temperature.find('.value').html(`${Math.round(temperatureReading)}°`);
-        $humidity.find('.value').html(Math.round(humidityReading));
+        $temperature.removeClass(temperatureClasses).addClass(temperatureClass)
+          .find('.value').html(`${Math.round(temperatureReading)}°`);
+        $humidity.removeClass(humidityClasses).addClass(humidityClass)
+          .find('.value').html(Math.round(humidityReading));
         $hcho.removeClass(hchoClasses).addClass(hchoClass)
           .find('.value').html(Math.round(hchoReading));
 
@@ -205,18 +211,43 @@
         let maxAqiComponent = _.max(Object.values(aqiComponents), (item) => {
           return item.score;
         });
-        $aqi.removeClass(pmClasses).addClass(maxAqiComponent.bracket.grade).find('.value').html(maxAqiComponent.score);
+        $aqi.removeClass(pmClasses).addClass(maxAqiComponent.bracket.grade)
+          .find('.value').html(maxAqiComponent.score);
       })
       .always(() => {
         setTimeout(refreshUI, 2000);
       });
     }
 
-    function calculateHCHOClass(hchoReading) {
-      if (hchoReading > 80) {
+    function calculateTemperatureClass(reading) {
+      if (reading < 20) {
+        return 'cold';
+      }
+      else if (reading > 28) {
+        return 'hot';
+      }
+      else {
+        return 'temperate';
+      }
+    }
+
+    function calculateHumidityClass(reading) {
+      if (reading < 50) {
+        return 'dry';
+      }
+      else if (reading > 80) {
+        return 'humid';
+      }
+      else {
+        return 'temperate';
+      }
+    }
+
+    function calculateHCHOClass(reading) {
+      if (reading > 80) {
         return 'bad';
       }
-      else if (hchoReading > 16) {
+      else if (reading > 16) {
         return 'poor';
       }
       else {
