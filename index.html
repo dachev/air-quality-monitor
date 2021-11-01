@@ -244,10 +244,10 @@
     }
 
     function calculateHumidityClass(reading) {
-      if (reading < 50) {
+      if (reading < 40) {
         return 'dry';
       }
-      else if (reading > 80) {
+      else if (reading > 60) {
         return 'humid';
       }
       else {
