@@ -232,10 +232,11 @@
     }
 
     function calculateTemperatureClass(reading) {
-      if (reading < 20) {
+      let intRading = Math.round(reading);
+      if (intRading < 20) {
         return 'cold';
       }
-      else if (reading > 28) {
+      else if (intRading > 28) {
         return 'hot';
       }
       else {
@@ -244,10 +245,11 @@
     }
 
     function calculateHumidityClass(reading) {
+      let intRading = Math.round(reading);
       if (reading < 40) {
         return 'dry';
       }
-      else if (reading > 60) {
+      else if (intRading > 60) {
         return 'humid';
       }
       else {
@@ -256,10 +258,11 @@
     }
 
     function calculateHCHOClass(reading) {
-      if (reading > 80) {
+      let intRading = Math.round(reading);
+      if (intRading > 80) {
         return 'bad';
       }
-      else if (reading > 16) {
+      else if (intRading > 16) {
         return 'poor';
       }
       else {
