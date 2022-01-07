@@ -192,7 +192,7 @@
       let $pm40 = $('.pm40');
       let $pm10 = $('.pm10');
 
-      $.get('index.json')
+      $.get('index.json?ts=' + (+new Date))
       .done((data) => {
         let temperatureReading = data.temperature;
         let humidityReading = data.humidity;
