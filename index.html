@@ -19,84 +19,113 @@
       height: 100%;
     }
 
-    .metric {
+    .measure {
       position: relative;
       background-color: #EEEEEE;
       border-color: #FFFFFF !important;
     }
 
-    .metric .label {
+    .measure .label {
       padding: 0px 10px;
       background-color: rgba(0,0,0,0.15);
       color: rgba(255,255,255,0.75);
     }
 
-    .metric .value {
+    .measure .value {
       font-size: 7vw;
       color: #FFF;
     }
 
-    .metric.aqi .value {
+    .measure.aqi .value {
       font-size: 20vw;
     }
 
-    .metric.cold {
+    /* temperature */
+    .measure.cold {
       background-color: #3333FF;
     }
 
-    .metric.hot {
+    .measure.hot {
       background-color: #FF0000;
     }
 
-    .metric.temperate {
+    .measure.temperate {
       background-color: #007700;
     }
     
-    .metric.dry {
+    /* humidity */
+    .measure.dry {
       background-color: #EEAA00;
     }
 
-    .metric.humid {
+    .measure.humid {
       background-color: #3333FF;
     }
 
-    .metric.good {
+    /* HCHO */
+    .measure.good {
       background-color: #007700;
     }
 
-    .metric.poor {
+    .measure.mediocre {
       background-color: #EEAA00;
     }
 
-    .metric.bad {
+    .measure.bad {
       background-color: #770000;
     }
 
-    .metric.grade1 {
+    /* CO2 */
+    .measure.excellent {
       background-color: #007700;
     }
 
-    .metric.grade2 {
+    .measure.fine {
       background-color: #EEBB00;
     }
 
-    .metric.grade3 {
+    .measure.moderate {
       background-color: #FF7E00;
     }
 
-    .metric.grade4 {
+    .measure.poor {
       background-color: #FF0000;
     }
 
-    .metric.grade5 {
+    .measure.very_poor {
       background-color: #99004c;
     }
 
-    .metric.grade6 {
+    .measure.severe {
       background-color: #7e0023;
     }
 
-    .metric.grade7 {
+    /* particulate */
+    .measure.grade1 {
+      background-color: #007700;
+    }
+
+    .measure.grade2 {
+      background-color: #EEBB00;
+    }
+
+    .measure.grade3 {
+      background-color: #FF7E00;
+    }
+
+    .measure.grade4 {
+      background-color: #FF0000;
+    }
+
+    .measure.grade5 {
+      background-color: #99004c;
+    }
+
+    .measure.grade6 {
+      background-color: #7e0023;
+    }
+
+    .measure.grade7 {
       background-color: #7e0023;
     }
   </style>
@@ -183,23 +212,26 @@
       let pmClasses = 'grade1 grade2 grade3 grade4 grade5 grade6 grade7';
       let temperatureClasses = 'cold hot temperate';
       let humidityClasses = 'dry humid temperate';
-      let hchoClasses = 'good poor bad';
+      let hchoClasses = 'good mediocre bad';
+      let co2Classes = 'excellent fine moderate poor very_poor severe';
       let $aqi = $('.aqi');
       let $temperature = $('.temperature');
       let $humidity = $('.humidity');
       let $hcho = $('.hcho');
-      let $pm25 = $('.pm25');
-      let $pm40 = $('.pm40');
       let $pm10 = $('.pm10');
+      let $pm25 = $('.pm25');
+      let $co2 = $('.co2');
 
       $.get('index.json?ts=' + (+new Date))
       .done((data) => {
         let temperatureReading = data.temperature;
         let humidityReading = data.humidity;
         let hchoReading = data.hcho;
+        let co2Reading = data.co2;
         let temperatureClass = calculateTemperatureClass(temperatureReading);
         let humidityClass = calculateHumidityClass(humidityReading);
         let hchoClass = calculateHCHOClass(hchoReading);
+        let co2Class = calculateCO2Class(co2Reading);
 
         $temperature.removeClass(temperatureClasses).addClass(temperatureClass)
           .find('.value').html(`${Math.round(temperatureReading)}°`);
@@ -207,16 +239,15 @@
           .find('.value').html(Math.round(humidityReading));
         $hcho.removeClass(hchoClasses).addClass(hchoClass)
           .find('.value').html(Math.round(hchoReading));
+        $co2.removeClass(co2Classes).addClass(co2Class)
+          .find('.value').html(Math.round(co2Reading));
 
         let pm25Reading = data['pm2.5'];
-        let pm40Reading = data['pm4.0'];
         let pm10Reading = data['pm10.0'];
-        let aqiComponents = calculateAQIs(pm25Reading, pm40Reading, pm10Reading);
+        let aqiComponents = calculateAQIs(pm25Reading, pm10Reading);
 
         $pm25.removeClass(pmClasses).addClass(aqiComponents.pm25.bracket.grade)
           .find('.value').html(Math.round(pm25Reading));
-        $pm40.removeClass(pmClasses).addClass(aqiComponents.pm40.bracket.grade)
-          .find('.value').html(Math.round(pm40Reading));
         $pm10.removeClass(pmClasses).addClass(aqiComponents.pm10.bracket.grade)
           .find('.value').html(Math.round(pm10Reading));
 
@@ -263,19 +294,38 @@
         return 'bad';
       }
       else if (intRading > 16) {
-        return 'poor';
+        return 'mediocre';
       }
       else {
         return 'good';
       }
     }
 
-    function calculateAQIs(pm25Reading, pm40Reading, pm10Reading) {
+    function calculateCO2Class(reading) {
+      let intRading = Math.round(reading);
+      if (intRading <= 400) {
+        return 'excellent';
+      }
+      else if (intRading <= 1000) {
+        return 'fine';
+      }
+      else if (intRading <= 1500) {
+        return 'moderate';
+      }
+      else if (intRading <= 2000) {
+        return 'poor';
+      }
+      else if (intRading <= 5000) {
+        return 'very_poor';
+      }
+      else {
+        return 'severe';
+      }
+    }
+
+    function calculateAQIs(pm25Reading, pm10Reading) {
       let pm25Bracket = _.find(pm25RangeMap, (item) => {
           return pm25Reading < item.readingRange[1];
-      });
-      let pm40Bracket = _.find(pm25RangeMap, (item) => {
-          return pm40Reading < item.readingRange[1];
       });
       let pm10Bracket = _.find(pm10RangeMap, (item) => {
           return pm10Reading < item.readingRange[1];
@@ -285,10 +335,6 @@
         pm25: {
           score: calculateAQI(pm25Reading, pm25Bracket),
           bracket: pm25Bracket
-        },
-        pm40: {
-          score: calculateAQI(pm40Reading, pm40Bracket),
-          bracket: pm40Bracket
         },
         pm10: {
           score: calculateAQI(pm10Reading, pm10Bracket),
@@ -316,36 +362,36 @@
   <div id="canvas" class="d-flex flex-row">
     <div class="d-flex flex-row col-6 left">
       <div class="d-flex flex-column col-6 sfa30">
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0 metric temperature">
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0 measure temperature">
           <small class="label position-absolute top-0 start-0">temperature</small>
           <div class="value fw-bold">0°</div>
         </div>
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0 metric humidity">
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0 measure humidity">
           <small class="label position-absolute top-0 start-0">humidity</small>
           <div class="value fw-bold">0</div>
         </div>
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0  border-bottom-0 metric hcho">
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-start-0 border-end-0 border-top-0  border-bottom-0 measure hcho">
           <small class="label position-absolute top-0 start-0">hcho</small>
           <div class="value fw-bold">0</div>
         </div>
       </div>
-      <div class="d-flex flex-column col-6 sps30">
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 metric pm25">
+      <div class="d-flex flex-column col-6 right">
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 measure pm25">
           <small class="label position-absolute top-0 start-0">pm2.5</small>
           <div class="value fw-bold">0°</div>
         </div>
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 metric pm40">
-          <small class="label position-absolute top-0 start-0">pm4.0</small>
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 measure pm10">
+          <small class="label position-absolute top-0 start-0">pm10</small>
           <div class="value fw-bold">0</div>
         </div>
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0  border-bottom-0 metric pm10">
-          <small class="label position-absolute top-0 start-0">pm10</small>
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0  border-bottom-0 measure co2">
+          <small class="label position-absolute top-0 start-0">co2</small>
           <div class="value fw-bold">0</div>
         </div>
       </div>
     </div>
     <div class="col-6 d-flex flex-column right">
-      <div class="d-flex flex-row flex-fill justify-content-center align-items-center metric aqi">
+      <div class="d-flex flex-row flex-fill justify-content-center align-items-center measure aqi">
         <small class="label position-absolute top-0 end-0">aqi</small>
         <div class="value fw-bold">0</div>
       </div>
