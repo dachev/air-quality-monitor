@@ -75,6 +75,19 @@
       background-color: #770000;
     }
 
+    /* VOC */
+    .measure.good {
+      background-color: #007700;
+    }
+
+    .measure.mediocre {
+      background-color: #EEBB00;
+    }
+
+    .measure.bad {
+      background-color: #770000;
+    }
+
     /* CO2 */
     .measure.excellent {
       background-color: #007700;
@@ -213,24 +226,27 @@
       let temperatureClasses = 'cold hot temperate';
       let humidityClasses = 'dry humid temperate';
       let hchoClasses = 'good mediocre bad';
+      let vocClasses = 'good mediocre bad';
       let co2Classes = 'excellent fine moderate poor very_poor severe';
       let $aqi = $('.aqi');
       let $temperature = $('.temperature');
       let $humidity = $('.humidity');
       let $hcho = $('.hcho');
-      let $pm10 = $('.pm10');
-      let $pm25 = $('.pm25');
+      let $voc = $('.voc');
       let $co2 = $('.co2');
+      let $pm25 = $('.pm25');
 
       $.get('index.json?ts=' + (+new Date))
       .done((data) => {
         let temperatureReading = data.temperature;
         let humidityReading = data.humidity;
         let hchoReading = data.hcho;
+        let vocReading = data.voc;
         let co2Reading = data.co2;
         let temperatureClass = calculateTemperatureClass(temperatureReading);
         let humidityClass = calculateHumidityClass(humidityReading);
         let hchoClass = calculateHCHOClass(hchoReading);
+        let vocClass = calculateVOCClass(vocReading);
         let co2Class = calculateCO2Class(co2Reading);
 
         $temperature.removeClass(temperatureClasses).addClass(temperatureClass)
@@ -239,6 +255,8 @@
           .find('.value').html(Math.round(humidityReading));
         $hcho.removeClass(hchoClasses).addClass(hchoClass)
           .find('.value').html(Math.round(hchoReading));
+        $voc.removeClass(vocClasses).addClass(vocClass)
+          .find('.value').html(Math.round(vocReading));
         $co2.removeClass(co2Classes).addClass(co2Class)
           .find('.value').html(Math.round(co2Reading));
 
@@ -248,8 +266,6 @@
 
         $pm25.removeClass(pmClasses).addClass(aqiComponents.pm25.bracket.grade)
           .find('.value').html(Math.round(pm25Reading));
-        $pm10.removeClass(pmClasses).addClass(aqiComponents.pm10.bracket.grade)
-          .find('.value').html(Math.round(pm10Reading));
 
         let maxAqiComponent = _.max(Object.values(aqiComponents), (item) => {
           return item.score;
@@ -294,6 +310,19 @@
         return 'bad';
       }
       else if (intRading > 16) {
+        return 'mediocre';
+      }
+      else {
+        return 'good';
+      }
+    }
+
+    function calculateVOCClass(reading) {
+      let intRading = Math.round(reading);
+      if (intRading > 250) {
+        return 'bad';
+      }
+      else if (intRading > 100) {
         return 'mediocre';
       }
       else {
@@ -376,17 +405,17 @@
         </div>
       </div>
       <div class="d-flex flex-column col-6 right">
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 measure pm25">
-          <small class="label position-absolute top-0 start-0">pm2.5</small>
-          <div class="value fw-bold">0°</div>
-        </div>
-        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 measure pm10">
-          <small class="label position-absolute top-0 start-0">pm10</small>
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 measure voc">
+          <small class="label position-absolute top-0 start-0">voc</small>
           <div class="value fw-bold">0</div>
         </div>
         <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0  border-bottom-0 measure co2">
           <small class="label position-absolute top-0 start-0">co2</small>
           <div class="value fw-bold">0</div>
+        </div>
+        <div class="d-flex flex-fill justify-content-center align-items-center border border-top-0 measure pm25">
+          <small class="label position-absolute top-0 start-0">pm2.5</small>
+          <div class="value fw-bold">0°</div>
         </div>
       </div>
     </div>
